@@ -1,0 +1,82 @@
+var Alexa = require('alexa-sdk');
+
+var p1=10;
+var p2=20;
+var p3=30;
+var p4=40;
+var handlers ={
+    
+    'LaunchRequest': function() {
+        
+      this.attributes.Order = {
+        
+        'items': {
+          'I1': {
+            'number': 0,
+            'Rate': p1
+          },
+          'I2': {
+            'number': 0,
+            'Rate': p2
+          },
+          'I3': {
+            'number': 0,
+            'Rate': p3
+          },
+          'I4':{
+              'number':0,
+              'Rate': p4
+          }
+        
+        
+          
+        }
+      
+      
+    };
+    this.response.speak("Hello, Welcome to Hotel.Price of I1 is 20. Price of I2 is 30. Price of I3 is 40. Price of I4 is 40. What is your order?").listen("Please tell your order");
+    this.emit(':responseReady');
+    },
+    
+    'OrderIntent' : function(attributes) {
+       
+       this.attributes.order.number = this.event.request.intent.slots.item.value;
+        
+       this.attributes.order.cost = this.event.request.intent.slots.number.Rate.value;
+      
+        
+        this.emit(':responseReady');
+    },
+  
+    
+    
+    'TheCost' : function(){
+       
+        var cost='0';
+        var number1 = this.attributes.order.number;
+        var item1=this.attributes.order.item;
+        if(item1==='I1')
+         {  cost=cost+number1*p1;}
+        if(item1==='I2'){
+           cost=cost+number1*p2;}
+        if(item1==='I3'){
+           cost=cost+number1*p3;}
+        if(item1==='I4'){
+           cost=cost+number1*p4;}
+           
+      this.attributes.order=cost;
+      this.response.speak('The cost is'+cost);
+      
+      this.emit(':responseReady'); 
+    },
+  
+};
+
+
+
+exports.handler = function(event, context,callback){
+  var alexa = Alexa.handler(event,context,callback);
+  alexa.dynamoDBTableName = 'Order';
+  alexa.registerHandlers(handlers);
+  alexa.execute();
+};
